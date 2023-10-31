@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 function App() {
   const [page, setPage] = useState(1);
@@ -8,7 +8,7 @@ function App() {
   const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
   const API_KEY = import.meta.env.VITE_API_KEY;
   const IMAGES_PER_PAGE = 21;
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       const res = await fetch(
         `${API_ENDPOINT}?query=${searchInput.current.value.toLowerCase()}&page=${page},&per_page=${IMAGES_PER_PAGE}&client_id=${API_KEY}`
@@ -22,17 +22,21 @@ function App() {
     } catch (error) {
       console.log(error);
     }
-  };useEffect(() => {
+  }, [API_ENDPOINT, API_KEY, page]);
+  useEffect(() => {
     fetchImages();
-  }, [page]);
+  }, [fetchImages, page]);
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchImages();
+    resetSearch();
   };
   const handleSelection = (selection) => {
-    searchInput.current.value = selection;
-    fetchImages();
+    searchInput.current.value = selection; resetSearch()
   };
+  function resetSearch() {
+    setPage(1);
+    fetchImages();
+  }
   return (
     <main className="container max-w-full p-5">
       <h1 className="text-2xl font-bold text-center text-sky-600">
