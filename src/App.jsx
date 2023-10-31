@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 function App() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [images, setImages] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -10,28 +12,35 @@ function App() {
   const IMAGES_PER_PAGE = 21;
   const fetchImages = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${API_ENDPOINT}?query=${searchInput.current.value.toLowerCase()}&page=${page},&per_page=${IMAGES_PER_PAGE}&client_id=${API_KEY}`
-      );
-      if (!res.ok) {
-        throw new Error(`failed to fetch data : ${res.status}`);
+      setLoading(true);
+      if (searchInput.current.value.length > 0) {
+        const res = await fetch(
+          `${API_ENDPOINT}?query=${searchInput.current.value.toLowerCase()}&page=${page},&per_page=${IMAGES_PER_PAGE}&client_id=${API_KEY}`
+        );
+        if (!res.ok) {
+          throw new Error(`failed to fetch data : ${res.status}`);
+        }
+        const data = await res.json();console.log(data.results)
+        setImages(data.results);
+        setTotalPages(data.total_pages);
+        setLoading(false);
       }
-      const data = await res.json();
-      setImages(data.results);
-      setTotalPages(data.total_pages);
     } catch (error) {
-      console.log(error);
+      setLoading(false);
+      setError(true);
+      console.log(`error fetching the images: ${error}`);
     }
   }, [API_ENDPOINT, API_KEY, page]);
   useEffect(() => {
     fetchImages();
-  }, [fetchImages, page]);
+  }, [fetchImages]);
   const handleSubmit = (e) => {
     e.preventDefault();
     resetSearch();
   };
   const handleSelection = (selection) => {
-    searchInput.current.value = selection; resetSearch()
+    searchInput.current.value = selection;
+    resetSearch();
   };
   function resetSearch() {
     setPage(1);
@@ -75,36 +84,52 @@ function App() {
             {button.label}
           </button>
         ))}
-      </div>
-      <div className="container flex flex-wrap justify-center w-full gap-4 px-3 py-10 mx-auto rounded-sm bg-slate-100 images">
-        {images.map((image) => (
-          <img
-            loading="lazy"
-            key={image.id}
-            src={image.urls.small}
-            alt={image.alt_description}
-            className="m-2 rounded shadow w-72 h-80 image"
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap justify-center gap-4 py-5 buttons">
-        {page > 1 && (
-          <button
-            onClick={() => setPage((prev) => prev - 1)}
-            className="p-1 rounded bg-sky-500 text-slate-100 active:bg-sky-700 hover:bg-sky-600"
-          >
-            Previous
-          </button>
-        )}
-        {page < totalPages && (
-          <button
-            onClick={() => setPage((prev) => prev + 1)}
-            className="px-3 py-1 rounded hover:bg-sky-600 bg-sky-500 text-slate-100 active:bg-sky-700"
-          >
-            Next
-          </button>
-        )}
-      </div>
+      </div>{" "}
+      {loading ? (
+        <p>loading please wait,..</p>
+      ) : error ? (
+        <p>network error please try again</p>
+      ) : (
+        <>
+          <div className="container flex flex-wrap justify-center w-full gap-4 px-3 py-10 mx-auto rounded-sm bg-slate-100 images">
+            {images.map((image) => (
+              <img
+                loading="lazy"
+                key={image.id}
+                src={image.urls.small}
+                alt={image.alt_description}
+                className="m-2 rounded shadow w-72 h-80 image"
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 py-5 buttons">
+            {page > 1 && (
+              <button
+                onClick={() => setPage((prev) => prev - 1)}
+                className="p-1 rounded bg-sky-500 text-slate-100 active:bg-sky-700 hover:bg-sky-600"
+              >
+                Previous
+              </button>
+            )}
+            {page < totalPages && (
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                className="px-3 py-1 rounded hover:bg-sky-600 bg-sky-500 text-slate-100 active:bg-sky-700"
+              >
+                {" "}
+                {loading && (
+                  <div
+                    className="inline-block w-6 h-6 rounded-full spinner-border animate-spin border-3"
+                    role="status"
+                    aria-hidden="true"
+                  ></div>
+                )}
+                Next
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </main>
   );
 }
