@@ -45,6 +45,7 @@ function App() {
     setPage(1);
     fetchImages();
   }
+
   return (
     <main className="container max-w-full p-5">
       <h1 className="text-2xl font-bold text-center text-sky-600">
@@ -102,8 +103,8 @@ function App() {
           <div className="container flex flex-wrap justify-center w-full gap-4 px-3 py-10 mx-auto rounded-sm bg-slate-100 images">
             {images.map((image) => (
               <img
-                loading="lazy"
                 key={image.id}
+                loading="lazy"
                 src={image.urls.small}
                 alt={image.alt_description}
                 className="m-2 rounded shadow w-72 h-80 image"
@@ -124,14 +125,6 @@ function App() {
                 onClick={() => setPage((prev) => prev + 1)}
                 className="px-3 py-1 rounded hover:bg-sky-600 bg-sky-500 text-slate-100 active:bg-sky-700"
               >
-                {" "}
-                {loading && (
-                  <div
-                    className="inline-block w-6 h-6 rounded-full spinner-border animate-spin border-3"
-                    role="status"
-                    aria-hidden="true"
-                  ></div>
-                )}
                 Next
               </button>
             )}
