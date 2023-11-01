@@ -13,18 +13,17 @@ function App() {
   const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
-      if (searchInput.current.value.length > 0) {
-        const res = await fetch(
-          `${API_ENDPOINT}?query=${searchInput.current.value.toLowerCase()}&page=${page},&per_page=${IMAGES_PER_PAGE}&client_id=${API_KEY}`
-        );
-        if (!res.ok) {
-          throw new Error(`failed to fetch data : ${res.status}`);
-        }
-        const data = await res.json();console.log(data.results)
-        setImages(data.results);
-        setTotalPages(data.total_pages);
-        setLoading(false);
+
+      const res = await fetch(
+        `${API_ENDPOINT}?query=${searchInput.current.value.toLowerCase()}&page=${page},&per_page=${IMAGES_PER_PAGE}&client_id=${API_KEY}`
+      );
+      if (!res.ok) {
+        throw new Error(`failed to fetch data : ${res.status}`);
       }
+      const data = await res.json();
+      setImages(data.results);
+      setTotalPages(data.total_pages);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       setError(true);
@@ -51,12 +50,8 @@ function App() {
       <h1 className="text-2xl font-bold text-center text-sky-600">
         Image Search
       </h1>
-      <div className="search-section ">
-        <form
-          action=""
-          onSubmit={handleSubmit}
-          className="flex justify-center w-full p-2"
-        >
+      <div className="relative max-w-lg mx-auto search-section">
+        <form action="" onSubmit={handleSubmit} className="w-full p-2 ">
           {" "}
           <input
             type="search"
@@ -64,8 +59,15 @@ function App() {
             placeholder="Type something to search..."
             name=""
             id=""
-            className="placeholder:text-xs placeholder:text-slate-400 placeholder:italic border w-[50%] py-1 px-2 rounded-md shadow-sm focus:ring-sky-500 focus:ring-1 sm:text-sm focus:outline-none focus:border-sky-500  border-slate-300"
-          />
+            className="ml-5 placeholder:text-xs placeholder:text-slate-400 placeholder:ml-8 placeholder:italic border w-[80%] py-1 px-2 rounded-md shadow-sm focus:ring-sky-500 focus:ring-1 sm:text-sm focus:outline-none focus:border-sky-500  border-slate-300"
+          />{" "}
+          <button
+            
+            type="submit"
+            className="px-3 py-1 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Search
+          </button>
         </form>
       </div>{" "}
       <div className="flex flex-wrap gap-2 justify-around w-[30%] mx-auto m-2">
