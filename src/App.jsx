@@ -62,7 +62,6 @@ function App() {
             className="ml-5 placeholder:text-xs placeholder:text-slate-400 placeholder:ml-8 placeholder:italic border w-[80%] py-1 px-2 rounded-md shadow-sm focus:ring-sky-500 focus:ring-1 sm:text-sm focus:outline-none focus:border-sky-500  border-slate-300"
           />{" "}
           <button
-            
             type="submit"
             className="px-3 py-1 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
@@ -88,9 +87,16 @@ function App() {
         ))}
       </div>{" "}
       {loading ? (
-        <p>loading please wait,..</p>
+        <div className="flex flex-col justify-center gap-5 p-4">
+          <div className="mx-auto mt-5 custom-loader"></div>
+          <p className="text-center">loading, please wait...</p>
+        </div>
       ) : error ? (
         <p>network error please try again</p>
+      ) : images.length === 0 ? (
+        <p className="w-[60%] m-auto p-5 text-sm text-center text-slate-500">
+          No results found for keyword entered, please try again.
+        </p>
       ) : (
         <>
           <div className="container flex flex-wrap justify-center w-full gap-4 px-3 py-10 mx-auto rounded-sm bg-slate-100 images">
